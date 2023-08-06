@@ -1,0 +1,9 @@
+cff-version: 1.4.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Rong
+    given-names: Hua
+    orcid: https://orcid.org/0000-0002-4189-0893
+title: ronghuapython/OCT-blood: OCT blood
+version: V1.4
+date-released: 2023-08-06
