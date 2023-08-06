@@ -1,0 +1,99 @@
+import cv2
+import numpy as np 
+import pandas as pd 
+import os
+import math
+import matplotlib.pyplot as plt
+import cmath
+np.set_printoptions(threshold=np.inf)
+
+path = input('请输入图片文件夹路径：')
+
+filelist = os.listdir(path) 
+patients_name=filelist
+count=0
+for file in filelist:
+    print(file)
+for file in filelist:   
+    Olddir=os.path.join(path,file)   
+    if os.path.isdir(Olddir):   
+        continue
+    filename=os.path.splitext(file)[0]   
+    filetype=os.path.splitext(file)[1]   
+    Newdir=os.path.join(path,str(count).zfill(6)+filetype)  
+    os.rename(Olddir,Newdir)
+    count+=1
+
+a=os.listdir(path)
+a.sort(key= lambda x:int(x[:-4]))
+imgs = [cv2.imread(path + '/' + s) for s in os.listdir(path)]
+
+image=[]
+for i in range(len(imgs)):
+    image.append(cv2.cvtColor(imgs[i][410:665,22:725], cv2.COLOR_BGR2GRAY))
+
+plt.imshow(image[0],cmap='gray')
+
+img1=[]
+for i in range(len(imgs)):
+    img1.append(imgs[i][410:665,22:725])
+
+from scipy import misc
+from scipy import ndimage
+
+img_gaosi=[]
+for i in range(len(image)):
+    img_gaosi.append(ndimage.gaussian_filter(image[i],sigma=2))
+
+hengzhou=135
+zongzhou=20
+plt.plot([0,700],[hengzhou,hengzhou])
+plt.plot([zongzhou,zongzhou],[0,250])
+
+plt.imshow(img1[1],cmap='gray')
+print(img1[1][hengzhou,zongzhou])
+
+plt.plot([0,700],[hengzhou,hengzhou])
+plt.plot([zongzhou,zongzhou],[0,250])
+plt.imshow(img_gaosi[4],cmap='gray')
+print(img_gaosi[4][hengzhou,zongzhou])
+
+c=[]
+d=[]
+e=[]
+f=[]
+g=[]
+for i in range(len(img1)):
+    a=0
+    h=0
+    m=0
+    for x in range(0,img1[i].shape[0]):
+        for y in range(0,img1[i].shape[1]):
+            if img1[i][x,y][0]<100 and img1[i][x,y][1]<100 and img1[i][x,y][2]>100:
+                a+=1
+            if img1[i][x,y][0]>80 and img1[i][x,y][1]>80 and img1[i][x,y][2]>80:
+                h+=1
+            if image[i][x,y]>80:
+                m+=1
+
+    print(i,a,h,m)
+    d.append(a)
+    f.append(h)
+    g.append(m)
+    
+
+dataframe = pd.DataFrame(d)
+dataframe3 = pd.DataFrame(f)
+dataframe4 = pd.DataFrame(g)
+dataframe5 = pd.DataFrame(patients_name)
+dataframe6 = pd.DataFrame(dataframe/dataframe4)
+dataframe.columns=["绝对血流量"]
+dataframe3.columns=["有效位置"]
+dataframe4.columns=["高斯有效位置"]
+dataframe5.columns=["图片名"]
+dataframe6.columns=["相对血流量"]
+
+zong=pd.concat([dataframe5,dataframe,dataframe4,dataframe6],axis=1)
+zong.to_excel('OCTA结果.xls')
+
+
